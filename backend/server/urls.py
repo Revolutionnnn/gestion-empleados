@@ -10,6 +10,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Api routes
+    path('api/checking/', include('apps.checking.urls')),
     path('api/register/', include('apps.register.urls')),
     path('api/auth/', include('apps.authentication.urls')),
     path('api/', include(router.urls)),

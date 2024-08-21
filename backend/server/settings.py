@@ -88,6 +88,7 @@ LOCAL_APPS = [
     'apps.authentication',
     'apps.core',
     'apps.register',
+    'apps.checking',
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + LOCAL_APPS + DJANGO_APPS
