@@ -1,14 +1,13 @@
 <template>
     <div class="q-pa-md q-gutter-sm">
         <div>
-            <q-btn dense color="primary" label="Agregar sede" @click="add" style="margin-right: 8px;" />
+            <q-btn dense color="primary" label="Agregar persona" @click="add" style="margin-right: 8px;" />
             <q-btn dense color="primary" label="Actualizar" @click="startInfo" />
         </div>
 
-        <q-table title="Sedes" :rows="rows" :columns="columns" row-key="name" :pagination="pagination">
+        <q-table title="Registro de personas" :rows="rows" :columns="columns" row-key="name" :pagination="pagination">
             <template v-slot:body-cell="props">
                 <q-td :props="props">
-                    <!-- Verifica si la columna es 'is_active' -->
                     <div v-if="props.col.name === 'is_active'">
                         <q-toggle v-model="props.row.is_active" @input="toggleIsActive(props.row)"
                             @click="toggleIsActive(props.row)" />
@@ -29,24 +28,13 @@
                     </q-list>
                 </q-menu>
             </template>
-            <template v-slot:top-right>
-                <q-input borderless dense debounce="300" v-model="filter" placeholder="Buscar"
-                    @update:model-value="startInfo()">
-                    <template v-slot:append>
-                        <q-icon name="search" />
-                    </template>
-                </q-input>
-            </template>
-            <template v-slot:bottom>
-                <q-pagination v-model="pagination.page" max="20" color="primary" boundary-numbers input
-                    @update:model-value="startInfo" />
-            </template>
         </q-table>
     </div>
     <q-dialog v-model="addStablishment">
         <q-card class="q-dialog-plugin" style="width: 700px; max-width: 80vw;">
             <q-card-section class="row items-center q-pb-none">
-                <div class="text-h6">Agregar sede</div>
+                <div class="text-h6" v-if="!editing">Registrar personas</div>
+                <div class="text-h6" v-if="editing">Editar registro de personas</div>
                 <q-space />
                 <q-btn icon="close" flat round dense v-close-popup />
             </q-card-section>
@@ -57,10 +45,30 @@
                 <q-form @submit.prevent="handleSubmit" ref="myForm">
                     <div class="q-gutter-md">
                         <q-card-section class="row q-col-gutter-md">
-                            <q-input outlined v-model="user.name" label="Nombre de la sede" class="col-6 col-md-6"
+                            <q-input outlined v-model="user.name" label="Nombre" class="col-6 col-md-6"
                                 :rules="[required, lengthRange(0, 20)]" lazy-rules />
-                            <q-input outlined v-model="user.description" label="Descripcion de la sede"
-                                class="col-6 col-md-6" :rules="[required, lengthRange(0, 30)]" />
+                            <q-input outlined v-model="user.document" label="Documento"
+                                class="col-6 col-md-6" :rules="[required, lengthRange(0, 30), isInteger]" />
+                        </q-card-section>
+                    </div>
+                    <div class="q-gutter-md">
+                        <q-card-section class="row q-col-gutter-md">
+                            <q-input outlined v-model="user.phone" label="Telefono (Opcional)" class="col-6 col-md-6"
+                                :rules="[isInteger]" lazy-rules />
+                            <q-select outlined use-chips v-model="user.type" :options="TYPE_CHOICES"
+                                label="Tipo de persona a registrar" class="col-6 col-md-6" option-label="description" option-value="code" map-options
+                                emit-value :rules="[required]" />
+                        </q-card-section>
+                    </div>
+                    <div class="q-gutter-md">
+                        <q-card-section class="row q-col-gutter-md">
+                            <q-select outlined use-chips v-model="user.area" :options="areasOptions" v-if="user.type === EMPLOYEE"
+                                label="Sede" class="col-6 col-md-6" option-label="name" option-value="id" map-options
+                                emit-value :rules="[required]" />
+                            <q-input outlined v-model="user.rol" label="Cargo o Rol" class="col-6 col-md-6"
+                                :rules="[required, lengthRange(0, 20)]" lazy-rules v-if="user.type === EMPLOYEE"/>
+                            <q-input outlined v-model="user.business" label="Nombre de la empresa" class="col-6 col-md-6"
+                                :rules="[required, lengthRange(0, 20)]" lazy-rules v-if="user.type === PROVIDER"/>
                         </q-card-section>
                     </div>
 
@@ -77,17 +85,25 @@
 <script setup>
 import { onMounted, ref, reactive } from 'vue'
 import request from 'src/utils/axios.js';
-import { required, lengthRange } from 'src/utils/validations.js';
+import { required, lengthRange, isInteger } from 'src/utils/validations.js';
 import { useQuasar } from 'quasar'
 import { Notify } from 'quasar';
+import { TYPE_CHOICES, EMPLOYEE, PROVIDER } from 'src/constants/users'
 
 const $q = useQuasar()
 const myForm = ref(null)
 const filter = ref('')
+const areasOptions = ref(null)
 const user = ref({
     uuid: null,
     name: null,
+    phone: null,
+    document: null,
+    rol: null,
     description: null,
+    type: null,
+    area: null,
+    business: null,
     is_active: null
 })
 const pagination = reactive({
@@ -102,7 +118,12 @@ const addStablishment = ref(false)
 const columns = ref([
     { name: 'created', align: 'left', label: 'Creado el', field: 'created', sortable: true, format: val => val ? val.split('T')[0] : 'Sin datos' },
     { name: 'name', align: 'left', label: 'Nombre', field: 'name', sortable: true, format: val => val || 'Sin datos' },
-    { name: 'description', align: 'left', label: 'Descripcion', field: 'description', sortable: true, format: val => val || 'Sin datos' },
+    { name: 'document', align: 'left', label: 'Documento', field: 'document', sortable: true, format: val => val || 'Sin datos' },
+    { name: 'phone', align: 'left', label: 'Telefono', field: 'phone', sortable: true, format: val => val || 'Sin datos' },
+    { name: 'type', align: 'left', label: 'Tipo de persona', field: 'type', sortable: true, format: val => val?.description || 'Sin datos' },
+    { name: 'business', align: 'left', label: 'Negocio', field: 'business', sortable: true, format: val => val|| 'Sin datos' },
+
+    { name: 'is_active', label: 'Persona activa', field: 'is_active', align: 'center' },
 ])
 
 const clean = () => {
@@ -122,18 +143,26 @@ const handleSubmit = async () => {
     } else {
         save()
     }
+    myForm.value.resetValidation()
 }
 
 const add = async (row) => {
     addStablishment.value = true;
+    clean()
+    const { data } = await request.get('register/areas/')
+    areasOptions.value = data.results
     if (row.name) {
         editing.value = true
         user.value.uuid = row.uuid
         user.value.name = row.name
-        user.value.description = row.description
+        user.value.document = row.document
+        user.value.type = row.type?.code
+        user.value.area = row.area
+        user.value.phone = row.phone
+        user.value.business = row.business
+        user.value.rol = row.rol
         return
     }
-    clean()
     editing.value = false
 }
 
@@ -144,13 +173,20 @@ const onDialogHide = () => {
 const save = async () => {
     const formData = new FormData();
     formData.append('name', user.value.name);
-    formData.append('description', user.value.description);
+    formData.append('document', user.value.document);
+    formData.append('type', user.value.type);
+    formData.append('is_active', true);
+    console.log(user.value.business)
+    if (user.value.area) formData.append('area', user.value.area);
+    if (user.value.phone) formData.append('phone', user.value.phone);
+    if (user.value.business) formData.append('business', user.value.business);
+    if (user.value.rol) formData.append('rol', user.value.rol);
 
     try {
-        await request.post('register/areas/', formData);
+        await request.post('register/persons/', formData);
         Notify.create({
             type: 'positive',
-            message: 'Sede registrada',
+            message: 'Persona registrada',
             position: 'top',
         });
         startInfo()
@@ -158,7 +194,7 @@ const save = async () => {
     } catch (error) {
         Notify.create({
             type: 'negative',
-            message: 'Error al crear la sede',
+            message: 'Error al crear la persona',
             position: 'top',
         });     
     }
@@ -167,13 +203,20 @@ const save = async () => {
 const update = async () => {
     const formData = new FormData();
     formData.append('name', user.value.name);
-    formData.append('description', user.value.description);
+    formData.append('document', user.value.document);
+    formData.append('type', user.value.type);
+    formData.append('is_active', true);
+
+    if (user.value.area) formData.append('area', user.value.area.id ? user.value.area.id : user.value.area);
+    if (user.value.phone) formData.append('phone', user.value.phone);
+    if (user.value.business) formData.append('business', user.value.business);
+    if (user.value.rol) formData.append('rol', user.value.rol);
 
     try {
-        await request.patch(`register/areas/${user.value.uuid}/`, formData);
+        await request.patch(`register/persons/${user.value.uuid}/`, formData);
         Notify.create({
             type: 'positive',
-            message: 'Sede actualizada',
+            message: 'Persona actualizada',
             position: 'top',
         });
         startInfo()
@@ -181,15 +224,20 @@ const update = async () => {
     } catch (error) {
         Notify.create({
             type: 'negative',
-            message: 'Error al crear la sede',
+            message: 'Error al crear la persona',
             position: 'top',
         });    
     }
 }
 
+const toggleIsActive = async (row) => {
+    await request.patch(`register/persons/${row.uuid}/`, { is_active: row.is_active });
+}
+
+
 const startInfo = async () => {
     try {
-        const response = await request.get('register/areas/', {
+        const response = await request.get('register/persons/', {
             params: {
                 search: filter.value,
                 page: pagination.page,
@@ -210,12 +258,12 @@ const editUser = (row) => {
 
 const deleteUser = (row) => {
     $q.dialog({
-        title: 'Eliminar sede',
-        message: 'Estas seguro de eliminar esta sede?',
+        title: 'Eliminar persona',
+        message: 'Estas seguro de eliminar esta persona?',
         cancel: true,
         persistent: true
     }).onOk(async () => {
-        await request.delete(`register/areas/${row.uuid}/`)
+        await request.delete(`register/persons/${row.uuid}/`)
         await startInfo()
     })
 }

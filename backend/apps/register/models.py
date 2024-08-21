@@ -56,7 +56,9 @@ class Person(TimeStampedModel):
         Area,
         on_delete=models.CASCADE,
         related_name='person_area',
-        verbose_name="Área"
+        verbose_name="Área",
+        null=True,
+        blank=True
     )
     document = models.CharField(
         max_length=50,
@@ -69,7 +71,7 @@ class Person(TimeStampedModel):
         blank=True,
         verbose_name="Rol"
     )
-    bussines = models.CharField(
+    business = models.CharField(
         max_length=100,
         null=True,
         blank=True,

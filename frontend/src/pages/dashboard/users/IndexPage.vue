@@ -100,10 +100,10 @@ const editing = ref(false)
 const rows = ref([])
 const addUsers = ref(false)
 const columns = ref([
-    { name: 'username', align: 'left', label: 'Usuario', field: 'username', sortable: true, format: val => `${val}` || 'Sin datos' },
-    { name: 'first_name', align: 'left', label: 'Nombre', field: 'first_name', sortable: true, format: val => `${val}` || 'Sin datos' },
-    { name: 'last_name', align: 'left', label: 'Segundo nombre', field: 'last_name', sortable: true, format: val => `${val}` || 'Sin datos' },
-    { name: 'email', align: 'left', label: 'Correo', field: 'email', sortable: true, format: val => `${val}` || 'Sin datos' },
+    { name: 'username', align: 'left', label: 'Usuario', field: 'username', sortable: true, format: val => val || 'Sin datos' },
+    { name: 'first_name', align: 'left', label: 'Nombre', field: 'first_name', sortable: true, format: val => val || 'Sin datos' },
+    { name: 'last_name', align: 'left', label: 'Segundo nombre', field: 'last_name', sortable: true, format: val => val || 'Sin datos' },
+    { name: 'email', align: 'left', label: 'Correo', field: 'email', sortable: true, format: val => val || 'Sin datos' },
     { name: 'is_active', label: 'Activo', field: 'is_active', align: 'center' },
 ])
 

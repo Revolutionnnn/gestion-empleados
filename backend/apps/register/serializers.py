@@ -6,11 +6,12 @@ class AreaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Area
-        fields = ('uuid', 'created', 'name', 'description')
+        fields = ('id', 'uuid', 'created', 'name', 'description')
 
 
 class PersonListSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
+    area = AreaSerializer()
 
     class Meta:
         model = Person
@@ -23,14 +24,14 @@ class PersonListSerializer(serializers.ModelSerializer):
             'area',
             'document',
             'rol',
-            'bussines',
+            'business',
             'is_active'
         )
 
     def get_type(self, obj):
         return {
-            'code': self.type,
-            'description': obj.get_metodo_pago_display()
+            'code': obj.type,
+            'description': obj.get_type_display()
         }
 
 
@@ -47,6 +48,6 @@ class PersonSerializer(serializers.ModelSerializer):
             'area',
             'document',
             'rol',
-            'bussines',
+            'business',
             'is_active'
         )
