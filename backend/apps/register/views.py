@@ -2,6 +2,8 @@ from rest_framework import generics
 from .models import Area, Person
 from . import serializers
 from server.protect import ProtectRelatedDeleteMixin
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 
 
 class AreaListCreateView(generics.ListCreateAPIView):
@@ -19,6 +21,8 @@ class AreaUpdateDeleteView(ProtectRelatedDeleteMixin, generics.RetrieveUpdateDes
 class PersonListCreateView(generics.ListCreateAPIView):
     queryset = Person.objects.all()
     serializer_class = serializers.PersonListSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['type']
     search_fields = ['name', 'document']
 
     def get_serializer_class(self):

@@ -4,6 +4,10 @@
             <q-btn dense color="primary" label="Agregar persona" @click="add" style="margin-right: 8px;" />
             <q-btn dense color="primary" label="Actualizar" @click="startInfo" />
         </div>
+        <div class="row">
+            <q-select filled outlined use-chips v-model="typeFilter" option-label="description" option-value="code" :options="TYPE_CHOICES"
+                label="Tipo de personas" @update:model-value="startInfo" emit-value class="col-3" map-options/>
+        </div>
 
         <q-table title="Registro de personas" :rows="rows" :columns="columns" row-key="name" :pagination="pagination">
             <template v-slot:body-cell="props">
@@ -27,6 +31,14 @@
                         </q-item>
                     </q-list>
                 </q-menu>
+            </template>
+            <template v-slot:top-right>
+                <q-input borderless dense debounce="300" v-model="filter" placeholder="Buscar"
+                    @update:model-value="startInfo()">
+                    <template v-slot:append>
+                        <q-icon name="search" />
+                    </template>
+                </q-input>
             </template>
         </q-table>
     </div>
@@ -94,6 +106,7 @@ const $q = useQuasar()
 const myForm = ref(null)
 const filter = ref('')
 const areasOptions = ref(null)
+const typeFilter = ref(null)
 const user = ref({
     uuid: null,
     name: null,
@@ -176,7 +189,6 @@ const save = async () => {
     formData.append('document', user.value.document);
     formData.append('type', user.value.type);
     formData.append('is_active', true);
-    console.log(user.value.business)
     if (user.value.area) formData.append('area', user.value.area);
     if (user.value.phone) formData.append('phone', user.value.phone);
     if (user.value.business) formData.append('business', user.value.business);
@@ -241,7 +253,8 @@ const startInfo = async () => {
             params: {
                 search: filter.value,
                 page: pagination.page,
-                page_size: pagination.rowsPerPage
+                page_size: pagination.rowsPerPage,
+                type: typeFilter.value
             }
         })
         rows.value = response.data.results
