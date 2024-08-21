@@ -6,10 +6,11 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 
 urlpatterns = [
-    # Admin routes
+    # Admin routes only in develop
     path('admin/', admin.site.urls),
 
     # Api routes
+    path('api/register/', include('apps.register.urls')),
     path('api/auth/', include('apps.authentication.urls')),
     path('api/', include(router.urls)),
 ]
