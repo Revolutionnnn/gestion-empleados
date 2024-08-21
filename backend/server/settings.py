@@ -37,9 +37,9 @@ AUTH_USER_MODEL = "authentication.CustomUser"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'inicial',
-        'USER': 'inicial',
-        'PASSWORD': 'inicial',
+        'NAME': 'empleado',
+        'USER': 'empleado',
+        'PASSWORD': 'empleado',
         'HOST': 'dev-estructura-db',  # Usa el nombre del servicio de Docker
         'PORT': '5432',
     }
