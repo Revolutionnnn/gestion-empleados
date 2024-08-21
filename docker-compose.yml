@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  dev-estructura-db:
+    container_name: dev-estructura-db
+    image: postgres:13
+    restart: "no"
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_DB: inicial
+      POSTGRES_USER: inicial
+      POSTGRES_PASSWORD: inicial
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend-network
+
+  dev-estructura-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: dev-estructura-backend
+    container_name: dev-estructura-backend
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - dev-estructura-db
+    environment:
+      - DATABASE_URL=postgres://inicial:inicial@db:5432/inicial
+    networks:
+      - backend-network
+
+  dev-estructura-frontend:
+    container_name: dev-estructura-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "9000:9000"
+    restart: "no"
+    depends_on:
+      - dev-estructura-backend
+
+networks:
+  backend-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
