@@ -1,3 +1,5 @@
+Es necesario tener instalado docker para poder correr el proyecto
+
 Primer paso construir el contenedor
 docker compose up --build
 
