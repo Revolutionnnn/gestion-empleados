@@ -78,6 +78,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'apps.authentication',
+    'apps.core',
+    'apps.register',
+
 ]
 
 MIDDLEWARE = [
