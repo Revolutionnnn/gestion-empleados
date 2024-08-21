@@ -57,6 +57,12 @@ const linksList = [
     caption: 'Usuarios del sistema',
     icon: 'person',
     link: '/dashboard/user'
+  },
+  {
+    title: 'Areas',
+    caption: 'Configuración de las áreas',
+    icon: 'apartment',
+    link: '/dashboard/areas'
   }
 ]
 

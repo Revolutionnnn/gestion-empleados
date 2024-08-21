@@ -6,4 +6,4 @@ class AreaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Area
-        fields = ('uuid', 'name', 'description')
+        fields = ('uuid', 'created', 'name', 'description')

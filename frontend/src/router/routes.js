@@ -12,7 +12,8 @@ const routes = [
     meta: { requiresAuth: true },
     children: [
       { path: '', name: 'home', component: () => import('pages/IndexPage.vue') },
-      { path: 'user', name: 'users', component: () => import('pages/dashboard/users/IndexPage.vue') }
+      { path: 'user', name: 'users', component: () => import('pages/dashboard/users/IndexPage.vue') },
+      { path: 'areas', name: 'areas', component: () => import('pages/dashboard/areas/IndexPage.vue') },
     ]
   },
   {

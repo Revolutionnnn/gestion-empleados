@@ -131,7 +131,7 @@ const handleSubmit = async () => {
 
 const add = async (row) => {
     const { data } = await request.get('auth/groups/')
-    groupsOptions.value = data
+    groupsOptions.value = data.results
     addUsers.value = true;
     if (row.username) {
         editing.value = true
@@ -170,7 +170,11 @@ const save = async () => {
         startInfo()
         onDialogHide()
     } catch (error) {
-        console.error('Error al agregar usuario:', error);
+        Notify.create({
+            type: 'negative',
+            message: 'Error al agregar usuario',
+            position: 'top',
+        });
     }
 };
 
@@ -193,13 +197,17 @@ const update = async () => {
         startInfo()
         onDialogHide()
     } catch (error) {
-        console.error('Error al agregar usuario:', error);
+        Notify.create({
+            type: 'negative',
+            message: 'Error al agregar usuario',
+            position: 'top',
+        });
     }
 }
 
 const startInfo = async () => {
     const response = await request.get('auth/users/')
-    rows.value = response.data
+    rows.value = response.data.results
 }
 
 const editUser = (row) => {
