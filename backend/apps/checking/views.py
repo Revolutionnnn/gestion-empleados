@@ -1,6 +1,7 @@
 from rest_framework import generics
 from .models import Check
 from . import serializers
+from rest_framework.response import Response
 
 
 class CheckingListCreateView(generics.ListCreateAPIView):
@@ -16,3 +17,12 @@ class CheckingListCreateView(generics.ListCreateAPIView):
         request._full_data = mutable_data
 
         return super().create(request, *args, **kwargs)
+
+
+class CheckinsTodayListView(generics.ListAPIView):
+    serializer_class = serializers.CheckinsTodaySerializer
+
+    def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer()
+        data = serializer.to_representation(None)
+        return Response(data)

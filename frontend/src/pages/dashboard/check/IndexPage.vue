@@ -67,8 +67,13 @@
     const formData = new FormData();
     if (user.value.reason) formData.append('reason', user.value.reason);
     try {
+        const respuesta2 = await request.get('checking/inside/')
+        console.log(respuesta2)
+
         const respuesta = await request.post(`checking/${user.value.document}/`, formData)
         user.value.document = null
+        motive.value = false
+        user.value.reason = null
         if (!respuesta.data.check_out) {
         Notify.create({
             type: 'positive',
