@@ -67,7 +67,7 @@
     const formData = new FormData();
     if (user.value.reason) formData.append('reason', user.value.reason);
     try {
-        const respuesta2 = await request.get('checking/inside/')
+        const respuesta2 = await request.get('checking/1234')
         console.log(respuesta2)
 
         const respuesta = await request.post(`checking/${user.value.document}/`, formData)

@@ -75,6 +75,12 @@ const linksList = [
     caption: 'Registro de entrada y salida',
     icon: 'check_circle',
     link: '/dashboard/check'
+  },
+  {
+    title: 'Personas dentro del edificio',
+    caption: 'Reporte de personas dentro del edificio',
+    icon: 'show_chart',
+    link: '/dashboard/person_inside'
   }
 ]
 

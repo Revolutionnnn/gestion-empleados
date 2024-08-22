@@ -285,3 +285,4 @@ frontend/yarn.lock
 # End of https://www.toptal.com/developers/gitignore/api/vue,vuejs,python,django
 frontend/package-lock.json
 backend/apps/__pycache__/__init__.cpython-310.pyc
+frontend/yarn.lock
