@@ -37,10 +37,15 @@ request.interceptors.response.use(
   error => {
     const { response } = error;
     if (response) {
-      // El servidor devolvió una respuesta, pero con un código de estado que indica un error
       const { status } = response;
-      if (status === 400 || status === 402 || status === 500) {
-        // Mostrar notificación utilizando Quasar Notify
+      if (status === 400) {
+        Notify.create({
+          type: 'negative',
+          message: response.data[0],
+          position: 'top',
+        });
+      }
+      if (status === 402 || status === 500) {
         Notify.create({
           type: 'negative',
           message: 'Ops ha ocurrido un error',

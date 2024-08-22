@@ -68,6 +68,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # Application definition
 
+
 DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -139,6 +140,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'server.wsgi.application'
 
+TIME_ZONE = 'America/Bogota'
+USE_TZ = True
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -163,8 +167,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'es'
-
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 

@@ -4,6 +4,8 @@ FROM python:3.10-slim
 # Establece el directorio de trabajo
 WORKDIR /app
 
+ENV TZ=America/Bogota
+
 # Actualiza el índice de paquetes e instala las dependencias de sistema necesarias
 RUN apt-get update \
     && apt-get install -y \
@@ -12,7 +14,9 @@ RUN apt-get update \
     libpangocairo-1.0-0 \
     libgdk-pixbuf2.0-0 \
     libffi-dev \
-    shared-mime-info \
+    tzdata \
+    && ln -fs /usr/share/zoneinfo/America/Bogota /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

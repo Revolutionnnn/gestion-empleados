@@ -69,6 +69,12 @@ const linksList = [
     caption: 'Configuración de las personas',
     icon: 'group',
     link: '/dashboard/persons'
+  },
+  {
+    title: 'Registro',
+    caption: 'Registro de entrada y salida',
+    icon: 'check_circle',
+    link: '/dashboard/check'
   }
 ]
 

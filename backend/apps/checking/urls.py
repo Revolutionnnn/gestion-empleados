@@ -3,5 +3,5 @@ from django.urls import path
 
 
 urlpatterns = [
-    path('', views.CheckAPIView.as_view(), name='checking-api'),
+    path('<int:document>/', views.CheckingListCreateView.as_view(), name='check'),
 ]

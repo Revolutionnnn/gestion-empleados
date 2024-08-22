@@ -15,6 +15,7 @@ const routes = [
       { path: 'user', name: 'users', component: () => import('pages/dashboard/users/IndexPage.vue') },
       { path: 'areas', name: 'areas', component: () => import('pages/dashboard/areas/IndexPage.vue') },
       { path: 'persons', name: 'persons', component: () => import('pages/dashboard/persons/IndexPage.vue') },
+      { path: 'check', name: 'check', component: () => import('pages/dashboard/check/IndexPage.vue') },
     ]
   },
   {
