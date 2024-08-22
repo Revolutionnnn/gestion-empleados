@@ -1,11 +1,11 @@
 <template>
     <div class="q-pa-md q-gutter-sm">
         <div>
-            <q-btn dense color="primary" label="Agregar sede" @click="add" style="margin-right: 8px;" />
+            <q-btn dense color="primary" label="Agregar area" @click="add" style="margin-right: 8px;" />
             <q-btn dense color="primary" label="Actualizar" @click="startInfo" />
         </div>
 
-        <q-table title="Sedes" :rows="rows" :columns="columns" row-key="name" :pagination="pagination">
+        <q-table title="Áreas" :rows="rows" :columns="columns" row-key="name" :pagination="pagination">
             <template v-slot:body-cell="props">
                 <q-td :props="props">
                     <!-- Verifica si la columna es 'is_active' -->

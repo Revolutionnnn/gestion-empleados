@@ -59,7 +59,7 @@ const linksList = [
     link: '/dashboard/user'
   },
   {
-    title: 'Areas',
+    title: 'Áreas',
     caption: 'Configuración de las áreas',
     icon: 'apartment',
     link: '/dashboard/areas'

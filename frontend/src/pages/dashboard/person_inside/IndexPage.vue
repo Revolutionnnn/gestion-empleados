@@ -64,6 +64,8 @@ const onDialogHide = () => {
 const startInfo = async () => {
     try {
         const response = await request.get('checking/inside/')
+        const respnse2 = await request.get('checking/report-range/?id=8&start_date=2024-01-01&end_date=2024-10-01')
+        console.log(respnse2)
         rows.value = response.data
         numberPersons.value = `${response.data[0]?.people_inside_count} personas`
     } catch (error) {

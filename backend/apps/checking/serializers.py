@@ -82,5 +82,22 @@ class CheckinsTodaySerializer(serializers.Serializer):
 
         for person in persons_checkins_today:
             person['people_inside_count'] = people_inside_count
-
         return persons_checkins_today
+
+
+class ReportRangeSerializer(serializers.Serializer):
+    def get_calculate_hours(self, person_id, start_date, end_date):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT calculate_hours(%s, %s, %s);", [person_id, start_date, end_date])
+            result = cursor.fetchone()
+        return result[0] if result else 0
+
+    def get_persons_report_range(self, person_id, start_date, end_date):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM get_checking_repo(%s, %s, %s);", [person_id, start_date, end_date])
+            columns = [col[0] for col in cursor.description]
+            results = [
+                dict(zip(columns, row))
+                for row in cursor.fetchall()
+            ]
+        return results
