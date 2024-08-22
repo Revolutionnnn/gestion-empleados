@@ -94,7 +94,7 @@ class ReportRangeSerializer(serializers.Serializer):
 
     def get_persons_report_range(self, person_id, start_date, end_date):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM get_checking_repo(%s, %s, %s);", [person_id, start_date, end_date])
+            cursor.execute("SELECT * FROM get_checking_reports_range(%s, %s, %s);", [person_id, start_date, end_date])
             columns = [col[0] for col in cursor.description]
             results = [
                 dict(zip(columns, row))

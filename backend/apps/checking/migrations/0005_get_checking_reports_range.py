@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             """
-            CREATE OR REPLACE FUNCTION get_checking_repo(
+            CREATE OR REPLACE FUNCTION get_checking_reports_range(
                 person_id_param INTEGER,
                 start_date TIMESTAMPTZ,
                 end_date TIMESTAMPTZ
@@ -21,7 +21,10 @@ class Migration(migrations.Migration):
                 uuid UUID,
                 person_id BIGINT,
                 check_in TIMESTAMPTZ,
-                check_out TIMESTAMPTZ
+                check_out TIMESTAMPTZ,
+                reason INTEGER,
+                created TIMESTAMPTZ,
+                modified TIMESTAMPTZ
             ) AS $$
             BEGIN
                 RETURN QUERY
@@ -29,7 +32,10 @@ class Migration(migrations.Migration):
                     chk.uuid,
                     chk.person_id,
                     chk.check_in,
-                    chk.check_out
+                    chk.check_out,
+                    chk.reason,
+                    chk.created,
+                    chk.modified
                 FROM checking_check chk
                 WHERE 
                     chk.person_id = person_id_param

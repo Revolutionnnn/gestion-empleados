@@ -44,6 +44,8 @@ class ReportRangeAPIView(generics.ListAPIView):
             )
 
         serializer = self.get_serializer()
+        start_date = f'{start_date} 00:00:00'
+        end_date = f'{end_date} 23:59:59'
         total_hours = serializer.get_calculate_hours(person_id, start_date, end_date)
         report_range = serializer.get_persons_report_range(person_id, start_date, end_date)
 

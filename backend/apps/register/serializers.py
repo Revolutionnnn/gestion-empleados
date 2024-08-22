@@ -16,6 +16,7 @@ class PersonListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = (
+            'id',
             'uuid',
             'created',
             'name',

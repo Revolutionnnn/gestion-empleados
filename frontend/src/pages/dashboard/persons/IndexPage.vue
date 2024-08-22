@@ -24,6 +24,9 @@
 
                     <q-list dense style="min-width: 100px">
                         <q-item clickable v-close-popup>
+                            <q-item-section @click="viewUser(props.row)">Ver información</q-item-section>
+                        </q-item>
+                        <q-item clickable v-close-popup>
                             <q-item-section @click="editUser(props.row)">Editar</q-item-section>
                         </q-item>
                         <q-item clickable v-close-popup>
@@ -93,6 +96,41 @@
             </q-card-section>
         </q-card>
     </q-dialog>
+    <q-dialog v-model="modalHours">
+        <q-card class="q-dialog-plugin" style="width: 1500px; max-width: 80vw;">
+            <q-card-section class="row items-center q-pb-none">
+                <div class="text-h6">Registrar de horas trabajadas</div>
+                <q-space />
+                <q-btn icon="close" flat round dense v-close-popup />
+            </q-card-section>
+
+            <q-separator />
+
+            <div class="q-pa-md" style="max-width: 500px">
+                <q-input filled v-model="dateFormated" label="Generar reporte">
+                <template v-slot:append>
+                    <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                        <q-date v-model="date" @update:model-value="dateFormat()" range mask="YYYY-MM-DD">
+                        <div class="row items-center justify-end">
+                            <q-btn v-close-popup label="Close" color="primary" flat />
+                        </div>
+                        </q-date>
+                    </q-popup-proxy>
+                    </q-icon>
+                </template>
+                </q-input>
+            </div>
+
+            <q-separator />
+
+
+            <q-card-section>
+            <q-table :rows="rowsDates" :columns="columnsDates">
+            </q-table>
+            </q-card-section>
+        </q-card>
+    </q-dialog>
 </template>
 <script setup>
 import { onMounted, ref, reactive } from 'vue'
@@ -100,14 +138,20 @@ import request from 'src/utils/axios.js';
 import { required, lengthRange, isInteger } from 'src/utils/validations.js';
 import { useQuasar } from 'quasar'
 import { Notify } from 'quasar';
-import { TYPE_CHOICES, EMPLOYEE, PROVIDER } from 'src/constants/users'
+import { TYPE_CHOICES, EMPLOYEE, PROVIDER, REASON_CHOICES } from 'src/constants/users'
+import moment from 'moment'
 
 const $q = useQuasar()
 const myForm = ref(null)
 const filter = ref('')
 const areasOptions = ref(null)
 const typeFilter = ref(null)
+const modalHours = ref(false)
+const date = ref(null)
+const dateFormated = ref(null)
+const rowsDates = ref([])
 const user = ref({
+    id: null,
     uuid: null,
     name: null,
     phone: null,
@@ -137,6 +181,19 @@ const columns = ref([
     { name: 'business', align: 'left', label: 'Negocio', field: 'business', sortable: true, format: val => val|| 'Sin datos' },
 
     { name: 'is_active', label: 'Persona activa', field: 'is_active', align: 'center' },
+])
+
+const getDescription = (code) => {
+    const choice = REASON_CHOICES.find(choice => choice.code === code);
+    return choice ? choice.description : 'Sin salida anticipada';
+};
+
+const columnsDates = ref([
+    { name: 'created', align: 'left', label: 'Creado el', field: row => moment(row.created), sortable: true, format: val => val.format('LL')},
+    { name: 'check_in', align: 'center', label: 'Ingreso.', field: row => moment(row.check_in), format: val => val.format('LTS'), sortable: true },
+    { name: 'check_out', align: 'center', label: 'Salida.', field: row => moment(row.check_in), format: val => val.format('LTS'), sortable: true },
+    { name: 'reason', align: 'center', label: 'Motivo.', field: 'reason', format: val => getDescription(val)   },
+
 ])
 
 const clean = () => {
@@ -279,6 +336,34 @@ const deleteUser = (row) => {
         await request.delete(`register/persons/${row.uuid}/`)
         await startInfo()
     })
+}
+
+const dateFormat = async () => {
+    if (date.value.from) {
+        dateFormated.value = `Desde ${date.value.from} hasta ${date.value.to}`
+        const response = await request.get(`checking/report-range/?id=${user.value.id}&start_date=${date.value.from}&end_date=${date.value.to}`)
+        rowsDates.value = response.data
+    } else {
+        const response = await request.get(`checking/report-range/?id=${user.value.id}&start_date=${date.value}&end_date=${date.value}`)
+        rowsDates.value = response.data
+        dateFormated.value = date.value
+    }
+}
+
+const viewUser = (row) => {
+    if (row.type.code !== EMPLOYEE) {
+        Notify.create({
+            type: 'negative',
+            message: 'Solo puedes ver esta información en los empleados',
+            position: 'top',
+        });
+        return
+    }
+    date.value = null
+    dateFormated.value = null
+    rowsDates.value = []
+    modalHours.value = true
+    user.value.id = row.id
 }
 
 onMounted(async () => {
