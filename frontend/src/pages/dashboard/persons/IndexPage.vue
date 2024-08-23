@@ -99,7 +99,7 @@
     <q-dialog v-model="modalHours">
         <q-card class="q-dialog-plugin" style="width: 1500px; max-width: 80vw;">
             <q-card-section class="row items-center q-pb-none">
-                <div class="text-h6">Registrar de horas trabajadas</div>
+                <div class="text-h6">Registro de horas trabajadas</div>
                 <q-space />
                 <q-btn icon="close" flat round dense v-close-popup />
             </q-card-section>

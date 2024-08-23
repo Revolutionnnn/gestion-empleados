@@ -11,6 +11,9 @@ Luego de descargar el proyecto sera necesario ingresar a la carpeta donde se enc
 Primero, construye el contenedor con el siguiente comando:
 
 docker compose up --build
+En caso de que genere error al crear el contenedor sera necesario apagar el contenedor
+Y de nuevo usar
+docker compose up
 
 ### 3. Realizar migraciones
 docker exec -it dev-empleados-backend python manage.py migrate
@@ -24,3 +27,8 @@ docker exec -it dev-empleados-backend python manage.py makemigrations
 
 Levantar contenedor
 docker compose up
+
+####  Puertos de la app
+Frontend http://127.0.0.1:9000/
+Backend http://127.0.0.1:8000/
+Base de datos 5435
