@@ -15,10 +15,6 @@
             <template v-slot:top-right>
                 <q-input dense readonly debounce="300" v-model="numberPersons" placeholder="Cantidad de personas"></q-input>
             </template>
-            <template v-slot:bottom>
-                <q-pagination v-model="pagination.page" max="20" color="primary" boundary-numbers input
-                    @update:model-value="startInfo" />
-            </template>
         </q-table>
     </div>
 </template>
@@ -44,7 +40,6 @@ const columns = ref([
 const startInfo = async () => {
     try {
         const response = await request.get('checking/inside/')
-        const respnse2 = await request.get('checking/report-range/?id=8&start_date=2024-01-01&end_date=2024-10-01')
         rows.value = response.data
         numberPersons.value = `${response.data[0]?.people_inside_count} personas`
     } catch (error) {

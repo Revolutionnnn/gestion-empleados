@@ -29,9 +29,13 @@ class CheckSerializer(serializers.ModelSerializer):
         today = timezone.now().date()
         instance_check = Check.objects.filter(person=person, check_in__date=today).last()
 
+        if not person.is_active:
+            raise serializers.ValidationError(
+                "Diríjase a recepción su usuario está desactivado."
+            )
+
         if instance_check and not instance_check.check_out:
             check_out = timezone.now()
-
             cutoff_time = check_out.replace(hour=16, minute=0, second=0, microsecond=0)
             if check_out < cutoff_time and not reason and person.type == Person.EMPLEYEE:
                 raise serializers.ValidationError(
