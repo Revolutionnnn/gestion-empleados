@@ -26,8 +26,8 @@ class CheckSerializer(serializers.ModelSerializer):
         document = validated_data.pop('document')
         reason = validated_data.get('reason')
         person = Person.objects.get(document=document)
-        today = timezone.now().date()
-        instance_check = Check.objects.filter(person=person, check_in__date=today).last()
+        today = timezone.now().astimezone(timezone.get_current_timezone()).date()
+        instance_check = Check.objects.filter(person=person.id, check_in__date=today).last()
 
         if not person.is_active:
             raise serializers.ValidationError(
@@ -35,7 +35,8 @@ class CheckSerializer(serializers.ModelSerializer):
             )
 
         if instance_check and not instance_check.check_out:
-            check_out = timezone.now()
+            check_out = timezone.now().astimezone(timezone.get_current_timezone())
+            print(check_out)
             cutoff_time = check_out.replace(hour=16, minute=0, second=0, microsecond=0)
             if check_out < cutoff_time and not reason and person.type == Person.EMPLEYEE:
                 raise serializers.ValidationError(
