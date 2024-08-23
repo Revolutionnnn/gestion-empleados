@@ -49,7 +49,7 @@
     <q-dialog v-model="addStablishment">
         <q-card class="q-dialog-plugin" style="width: 700px; max-width: 80vw;">
             <q-card-section class="row items-center q-pb-none">
-                <div class="text-h6">Agregar sede</div>
+                <div class="text-h6">Agregar área</div>
                 <q-space />
                 <q-btn icon="close" flat round dense v-close-popup />
             </q-card-section>
@@ -60,9 +60,9 @@
                 <q-form @submit.prevent="handleSubmit" ref="myForm">
                     <div class="q-gutter-md">
                         <q-card-section class="row q-col-gutter-md">
-                            <q-input outlined v-model="area.name" label="Nombre de la sede" class="col-6 col-md-6"
+                            <q-input outlined v-model="area.name" label="Nombre de el área" class="col-6 col-md-6"
                                 :rules="[required, lengthRange(0, 20)]" lazy-rules />
-                            <q-input outlined v-model="area.description" label="Descripcion de la sede"
+                            <q-input outlined v-model="area.description" label="Descripcion de el área"
                                 class="col-6 col-md-6" :rules="[required, lengthRange(0, 30)]" />
                         </q-card-section>
                     </div>
@@ -211,7 +211,7 @@ const save = async () => {
         await request.post('register/areas/', formData);
         Notify.create({
             type: 'positive',
-            message: 'Sede registrada',
+            message: 'área registrada',
             position: 'top',
         });
         startInfo()
@@ -219,7 +219,7 @@ const save = async () => {
     } catch (error) {
         Notify.create({
             type: 'negative',
-            message: 'Error al crear la sede',
+            message: 'Error al crear la área',
             position: 'top',
         });     
     }
@@ -234,7 +234,7 @@ const update = async () => {
         await request.patch(`register/areas/${area.value.uuid}/`, formData);
         Notify.create({
             type: 'positive',
-            message: 'Sede actualizada',
+            message: 'área actualizada',
             position: 'top',
         });
         startInfo()
@@ -242,7 +242,7 @@ const update = async () => {
     } catch (error) {
         Notify.create({
             type: 'negative',
-            message: 'Error al crear la sede',
+            message: 'Error al crear la área',
             position: 'top',
         });    
     }
@@ -271,8 +271,8 @@ const editArea = (row) => {
 
 const deleteArea = (row) => {
     $q.dialog({
-        title: 'Eliminar sede',
-        message: 'Estas seguro de eliminar esta sede?',
+        title: 'Eliminar área',
+        message: 'Estas seguro de eliminar esta área?',
         cancel: true,
         persistent: true
     }).onOk(async () => {
