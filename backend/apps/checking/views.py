@@ -52,7 +52,7 @@ class ReportRangeAPIView(generics.ListAPIView):
         for report in report_range:
             report['total_hours'] = f"{total_hours}"
         return Response(report_range, status=status.HTTP_200_OK)
-    
+
 
 class ReportAreaRangeAPIView(generics.ListAPIView):
     serializer_class = serializers.ReportAreaRangeSerializer
