@@ -19,16 +19,11 @@
     </div>
 </template>
 <script setup>
-import { onMounted, ref, reactive } from 'vue'
+import { onMounted, ref } from 'vue'
 import request from 'src/utils/axios.js';
 import moment from 'moment'
 
 const numberPersons = ref('')
-const pagination = reactive({
-    page: 1,
-    rowsPerPage: 10,
-    rowsNumber: 0
-})
 
 const rows = ref([])
 const columns = ref([
