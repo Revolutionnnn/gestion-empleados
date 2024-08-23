@@ -101,3 +101,21 @@ class ReportRangeSerializer(serializers.Serializer):
                 for row in cursor.fetchall()
             ]
         return results
+
+
+class ReportAreaRangeSerializer(serializers.Serializer):
+    def get_calculate_area_hours(self, person_id, start_date, end_date):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT calculate_total_hours_area(%s, %s, %s);", [person_id, start_date, end_date])
+            result = cursor.fetchone()
+        return result[0] if result else 0
+
+    def get_area_report_range(self, person_id, start_date, end_date):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM get_checking_reports_area_range(%s, %s, %s);", [person_id, start_date, end_date])
+            columns = [col[0] for col in cursor.description]
+            results = [
+                dict(zip(columns, row))
+                for row in cursor.fetchall()
+            ]
+        return results

@@ -21,10 +21,13 @@
 
                     <q-list dense style="min-width: 100px">
                         <q-item clickable v-close-popup>
-                            <q-item-section @click="editUser(props.row)">Editar</q-item-section>
+                            <q-item-section @click="viewInfo(props.row)">Ver más información</q-item-section>
                         </q-item>
                         <q-item clickable v-close-popup>
-                            <q-item-section @click="deleteUser(props.row)">Eliminar</q-item-section>
+                            <q-item-section @click="editArea(props.row)">Editar</q-item-section>
+                        </q-item>
+                        <q-item clickable v-close-popup>
+                            <q-item-section @click="deleteArea(props.row)">Eliminar</q-item-section>
                         </q-item>
                     </q-list>
                 </q-menu>
@@ -57,9 +60,9 @@
                 <q-form @submit.prevent="handleSubmit" ref="myForm">
                     <div class="q-gutter-md">
                         <q-card-section class="row q-col-gutter-md">
-                            <q-input outlined v-model="user.name" label="Nombre de la sede" class="col-6 col-md-6"
+                            <q-input outlined v-model="area.name" label="Nombre de la sede" class="col-6 col-md-6"
                                 :rules="[required, lengthRange(0, 20)]" lazy-rules />
-                            <q-input outlined v-model="user.description" label="Descripcion de la sede"
+                            <q-input outlined v-model="area.description" label="Descripcion de la sede"
                                 class="col-6 col-md-6" :rules="[required, lengthRange(0, 30)]" />
                         </q-card-section>
                     </div>
@@ -73,6 +76,42 @@
             </q-card-section>
         </q-card>
     </q-dialog>
+    <q-dialog v-model="modalHours">
+        <q-card class="q-dialog-plugin" style="width: 1500px; max-width: 80vw;">
+            <q-card-section class="row items-center q-pb-none">
+                <div class="text-h6">Registrar de horas area</div>
+                <q-space />
+                <q-btn icon="close" flat round dense v-close-popup />
+            </q-card-section>
+
+            <q-separator />
+
+            <div class="q-pa-md" style="max-width: 500px">
+                <q-input filled v-model="dateFormated" label="Generar reporte" readonly>
+                <template v-slot:append>
+                    <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                        <q-date v-model="date" @update:model-value="dateFormat()" range mask="YYYY-MM-DD">
+                        <div class="row items-center justify-end">
+                            <q-btn v-close-popup label="Close" color="primary" flat />
+                        </div>
+                        </q-date>
+                    </q-popup-proxy>
+                    </q-icon>
+                </template>
+                </q-input>
+                <q-input filled v-model="totalHours" label="Horas totales" readonly></q-input>
+            </div>
+
+            <q-separator />
+
+
+            <q-card-section>
+            <q-table :rows="rowsDates" :columns="columnsDates">
+            </q-table>
+            </q-card-section>
+        </q-card>
+    </q-dialog>
 </template>
 <script setup>
 import { onMounted, ref, reactive } from 'vue'
@@ -80,11 +119,18 @@ import request from 'src/utils/axios.js';
 import { required, lengthRange } from 'src/utils/validations.js';
 import { useQuasar } from 'quasar'
 import { Notify } from 'quasar';
+import moment from 'moment'
+import { REASON_CHOICES } from 'src/constants/users'
 
 const $q = useQuasar()
 const myForm = ref(null)
 const filter = ref('')
-const user = ref({
+const modalHours = ref(false)
+const date = ref(null)
+const dateFormated = ref(null)
+const rowsDates = ref([])
+const totalHours = ref(null)
+const area = ref({
     uuid: null,
     name: null,
     description: null,
@@ -105,10 +151,25 @@ const columns = ref([
     { name: 'description', align: 'left', label: 'Descripcion', field: 'description', sortable: true, format: val => val || 'Sin datos' },
 ])
 
+const getDescription = (code) => {
+    const choice = REASON_CHOICES.find(choice => choice.code === code);
+    return choice ? choice.description : 'Sin salida anticipada';
+};
+
+const columnsDates = ref([
+    { name: 'created', align: 'left', label: 'Creado el', field: row => moment(row.created), sortable: true, format: val => val.format('LL')},
+    { name: 'person_name', align: 'left', label: 'Nombre', field: 'person_name', sortable: true, format: val => val || 'Sin datos' },
+    { name: 'person_document', align: 'left', label: 'Documento', field: 'person_document', sortable: true, format: val => val || 'Sin datos' },
+    { name: 'check_in', align: 'center', label: 'Ingreso.', field: row => moment(row.check_in), format: val => val.format('LTS'), sortable: true },
+    { name: 'check_out', align: 'center', label: 'Salida.', field: row => moment(row.check_in), format: val => val.format('LTS'), sortable: true },
+    { name: 'reason', align: 'center', label: 'Motivo.', field: 'reason', format: val => getDescription(val)   },
+
+])
+
 const clean = () => {
-    for (const key in user.value) {
-        if (Object.hasOwnProperty.call(user.value, key)) {
-            user.value[key] = null;
+    for (const key in area.value) {
+        if (Object.hasOwnProperty.call(area.value, key)) {
+            area.value[key] = null;
         }
     }
 }
@@ -128,9 +189,9 @@ const add = async (row) => {
     addStablishment.value = true;
     if (row.name) {
         editing.value = true
-        user.value.uuid = row.uuid
-        user.value.name = row.name
-        user.value.description = row.description
+        area.value.uuid = row.uuid
+        area.value.name = row.name
+        area.value.description = row.description
         return
     }
     clean()
@@ -143,8 +204,8 @@ const onDialogHide = () => {
 
 const save = async () => {
     const formData = new FormData();
-    formData.append('name', user.value.name);
-    formData.append('description', user.value.description);
+    formData.append('name', area.value.name);
+    formData.append('description', area.value.description);
 
     try {
         await request.post('register/areas/', formData);
@@ -166,11 +227,11 @@ const save = async () => {
 
 const update = async () => {
     const formData = new FormData();
-    formData.append('name', user.value.name);
-    formData.append('description', user.value.description);
+    formData.append('name', area.value.name);
+    formData.append('description', area.value.description);
 
     try {
-        await request.patch(`register/areas/${user.value.uuid}/`, formData);
+        await request.patch(`register/areas/${area.value.uuid}/`, formData);
         Notify.create({
             type: 'positive',
             message: 'Sede actualizada',
@@ -204,11 +265,11 @@ const startInfo = async () => {
     }
 }
 
-const editUser = (row) => {
+const editArea = (row) => {
     add(row)
 }
 
-const deleteUser = (row) => {
+const deleteArea = (row) => {
     $q.dialog({
         title: 'Eliminar sede',
         message: 'Estas seguro de eliminar esta sede?',
@@ -218,6 +279,35 @@ const deleteUser = (row) => {
         await request.delete(`register/areas/${row.uuid}/`)
         await startInfo()
     })
+}
+
+const dateFormat = async () => {
+    if (date.value.from) {
+        dateFormated.value = `Desde ${date.value.from} hasta ${date.value.to}`
+        const response = await request.get(`checking/report-area/?id=${area.value.id}&start_date=${date.value.from}&end_date=${date.value.to}`)
+        rowsDates.value = response.data
+    } else {
+        const response = await request.get(`checking/report-area/?id=${area.value.id}&start_date=${date.value}&end_date=${date.value}`)
+        rowsDates.value = response.data
+        dateFormated.value = date.value
+    }
+    totalHours.value = rowsDates.value[0].total_hours
+    const [hours, minutes, seconds] = totalHours.value.split(':');
+
+    const Hours = parseInt(hours, 10);
+    const Minutes = parseInt(minutes, 10);
+
+    const formattedTime = `${Hours} horas y ${Minutes} minutos`;
+    totalHours.value = formattedTime
+}
+
+const viewInfo = (row) => {
+    date.value = null
+    dateFormated.value = null
+    totalHours.value = null
+    rowsDates.value = []
+    modalHours.value = true
+    area.value.id = row.id
 }
 
 onMounted(async () => {

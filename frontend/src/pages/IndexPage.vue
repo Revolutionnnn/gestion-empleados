@@ -1,10 +1,11 @@
 <template>
   <q-page class="flex flex-center">
-    <img
-      alt="Quasar logo"
-      src="~assets/quasar-logo-vertical.svg"
-      style="width: 200px; height: 200px"
-    >
+    <div class="text-center">
+      <h4>Bienvenido/a al Sistema de Gestión de Ingresos</h4>
+      <p>
+        Aquí encontrarás reportes y el registro de ingresos y salidas de empleados, invitados y proveedores.
+      </p>
+    </div>
   </q-page>
 </template>
 

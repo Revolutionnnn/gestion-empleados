@@ -107,7 +107,7 @@
             <q-separator />
 
             <div class="q-pa-md" style="max-width: 500px">
-                <q-input filled v-model="dateFormated" label="Generar reporte">
+                <q-input filled v-model="dateFormated" label="Generar reporte" readonly>
                 <template v-slot:append>
                     <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -120,6 +120,7 @@
                     </q-icon>
                 </template>
                 </q-input>
+                <q-input filled v-model="totalHours" label="Horas totales" readonly></q-input>
             </div>
 
             <q-separator />
@@ -150,6 +151,7 @@ const modalHours = ref(false)
 const date = ref(null)
 const dateFormated = ref(null)
 const rowsDates = ref([])
+const totalHours = ref(null)
 const user = ref({
     id: null,
     uuid: null,
@@ -348,6 +350,14 @@ const dateFormat = async () => {
         rowsDates.value = response.data
         dateFormated.value = date.value
     }
+    totalHours.value = rowsDates.value[0].total_hours
+    const [hours, minutes, seconds] = totalHours.value.split(':');
+
+    const Hours = parseInt(hours, 10);
+    const Minutes = parseInt(minutes, 10);
+
+    const formattedTime = `${Hours} horas y ${Minutes} minutos`;
+    totalHours.value = formattedTime
 }
 
 const viewUser = (row) => {
