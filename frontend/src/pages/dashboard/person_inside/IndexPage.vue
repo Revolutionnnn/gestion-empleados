@@ -41,6 +41,10 @@ const startInfo = async () => {
     try {
         const response = await request.get('checking/inside/')
         rows.value = response.data
+        if (rows.value.length == 0) {
+            numberPersons.value = '0 personas en el edificio'
+            return
+        }
         numberPersons.value = `${response.data[0]?.people_inside_count} personas`
     } catch (error) {
     }
